@@ -6,7 +6,7 @@
 /*   By: qcosta <qcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:08:27 by qcosta            #+#    #+#             */
-/*   Updated: 2022/06/24 16:58:24 by qcosta           ###   ########.fr       */
+/*   Updated: 2022/06/30 19:11:46 by qcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <string.h>
 #include <stddef.h>
 
-#define BUFFER_SIZE 5
+#define BUFFER_SIZE 3
 
 
 int	ft_strlen(char *s)
@@ -55,7 +55,7 @@ char	*ft_strdup_before_n(char *s)
 	new_str = (char *)malloc(sizeof(char) * (ft_strlen(s) + 1));
 	if (new_str == NULL)
 		return (NULL);
-	while (s[i] != '\n')
+	while (s[i] && s[i] != '\n')
 	{
 		new_str[i] = s[i];
 		i++;
@@ -63,6 +63,29 @@ char	*ft_strdup_before_n(char *s)
 	new_str[i] = '\0';
 	//free(s); ne peut pas se free tant que s est une constante
 	return (new_str);
+}
+
+char	*ft_after_n(char *s)
+{
+	char	*new_str;
+	int		i;
+	int		j;
+	
+	while (s && s[i] != '\n')
+		i++;
+	new_str = (char *)malloc(sizeof(char *) * (ft_strlen(s) - i + 1));
+	if (!new_str)
+		return (NULL);
+	while (s && s[i])
+	{
+		j++;
+		new_str[j] = s[i];
+		i++;
+	}
+	new_str[j] = '\0';
+	return (new_str);
+	
+	
 }
 char	*ft_strjoin(char *s1, char *s2)
 {
@@ -113,10 +136,12 @@ void	ft_putstr(char *s)
 char	*ft_read(int fd)
 {
 	int		ret;
-	static char	*buf;
-	char	*new_str;
+	char	*buf;
+	static char	*new_str = NULL;
+	char	*tmp;
 	
-	//ret = read(fd, buf, BUFFER_SIZE);
+	ret = 1;
+	
 	//new_str = NULL;  segmentation fault a cause de cette connerie
 	buf =  (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
 		if (!buf)
@@ -126,91 +151,50 @@ char	*ft_read(int fd)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
 		buf[ret] = '\0';
-		printf("comportement du buf : %s\n",buf);
-		new_str = ft_strjoin(new_str, buf);
+		//printf("comportement du buf : %s\n",buf);
+		tmp = new_str;
+		new_str = ft_strjoin(tmp, buf);
+		free(tmp);
 		
-		printf("comportement du buf apres strjoin : %s\n",new_str);
+		//printf("comportement du buf apres strjoin : %s\n",new_str);
 	}
 	//free (buf);
 	return new_str;
 }
 
-// une fonction qui stock apres le \n
 
-/*char	*get_line(int fd, char *line)
+char	*get_next_line(int fd)
 {
-	int ret;
-	static char *buf;
-	static char	*after_chariot;
-	buf =  (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	while (ret = read(fd, buf, BUFFER_SIZE))
-	{
-		buf[ret] = '\0';
-		//if (ft_strchr(buf, '\n'))
-			return (buf);
-	}
-	
-	
-	
-}*/
+	char	*before_n;
+	char	*str;
 
-/*char	*get_next_line(int fd)
-{
-	int	ret;
-	static char *buf;
-	//static char *buf[BUFFER_SIZE + 1];
+	before_n = ft_read(fd);
+	str = ft_strdup_before_n(before_n);
+	before_n = ft_after_n(before_n);
 	
-	
-	while (!(ft_strchr(buf, '\n')))
-	{
-		ret = read(fd, buf, BUFFER_SIZE);
-		//if (ft_strchr(buf, '\n'))
-			//return (buf);
-		buf[ret] = '\0';  // la fonction read ne lit pas le caractere nul.
-		//ft_putstr(buf);
-		
-	}
-	
-	return (buf);
-	//return (NULL);
-	//return (buf);
-}*/
+	return (str);
+}
 
 
 // read va lire dans un fichier et le stocker dans une varible pointeur sur void.
 int	main()
 {
 	int	fd;
-	//char	*ret;
-	char *str;
-	//char buf[BUF_SIZE + 1];
+	char *line;
+	
 	
 	fd = open("42.txt", O_RDONLY);
-	/*if (fd == -1)
+
+	line = "";
+
+	while (line != NULL)
 	{
-		ft_putstr("open() error");
-		return (1);
-	}*/
-	
-	//ret = get_next_line(fd);
-
-	str = ft_read(fd);
-	
-	printf("%s\n", str);
-	
-	printf("%s\n", ft_strdup_before_n(str));
-	free(str);
+		line = get_next_line(fd);
+		 printf("%s", line);
+		 
+	}
+	free(line);
 	close(fd);
-	//printf("fichier lut :%s", ret);
 
-	
-	//ret = read(fd, buf, BUF_SIZE);
-	//buf[ret] = '\0';
-	
-	
-	//ft_get_nbr(ret);
-	//ft_putstr(buf);
-	//printf("%s", ret);
-	//ft_putnbr(ret);
 	return (0);
 }
