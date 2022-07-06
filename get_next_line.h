@@ -6,7 +6,7 @@
 /*   By: qcosta <qcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:08:13 by qcosta            #+#    #+#             */
-/*   Updated: 2022/06/24 16:50:32 by qcosta           ###   ########.fr       */
+/*   Updated: 2022/07/06 09:47:04 by qcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int		ft_get_str(char *s);
 int		ft_nbr_len(int n);
 void	ft_putnbr(int n);
 int		ft_get_nbr(int n);
-char	*ft_strchr(char *s, int c);
+char	*ft_strchr(const char *s, int c);
 char	*ft_strjoin(char *s1, char *s2);
 
 #endif
