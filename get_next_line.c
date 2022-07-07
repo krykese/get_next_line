@@ -6,7 +6,7 @@
 /*   By: qcosta <qcosta@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/13 17:08:27 by qcosta            #+#    #+#             */
-/*   Updated: 2022/07/06 17:28:13 by qcosta           ###   ########.fr       */
+/*   Updated: 2022/07/07 15:03:40 by qcosta           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <string.h>
 #include <stddef.h>
 
-#define BUFFER_SIZE 7
+#define BUFFER_SIZE 5
 
 
 int	ft_strlen(char *s)
@@ -49,14 +49,17 @@ char	*ft_strchr(const char *s, int c)
 		return ((char *)s + i);
 	return (NULL);
 }
-char	*ft_strdup_before_n(char *s)
+/*char	*ft_strdup_before_n(char *s)
 {
 	char	*new_str;
 	int		i;
 
 
 	i = 0;
-	new_str = (char *)malloc(ft_strlen(s) + 1);
+
+	while (s && s[i] != '\n')
+		i++;
+	new_str = (char *)malloc(i + 2);
 	if (!new_str)
 		return (NULL);
 	while (s && s[i] != '\n')
@@ -64,11 +67,17 @@ char	*ft_strdup_before_n(char *s)
 		new_str[i] = s[i];
 		i++;
 	}
+	if (s[i] == '\n')
+	{
+		new_str[i] = s[i];
+		i++;
+	}
 	new_str[i] = '\0';
+	
 	//printf("result strdup before : %s\n",new_str);
 	//free(s);
 	return (new_str);
-}
+}*/
 
 char	*ft_after_n(char *s)
 {
@@ -85,15 +94,52 @@ char	*ft_after_n(char *s)
 		return (NULL);
 	while (s && s[i])
 	{
-		//j++;
-		new_str[j++] = s[i++];
-		//i++;
+		i++;
+		new_str[j] = s[i];
+		j++;
+		
 	}
 	new_str[j] = '\0';
 	return (new_str);
 	
 	
 }
+/*char	*ft_strjoin(char *s1, char *s2)
+{
+	int		i;
+	int		j;
+	char	*new_str;
+
+	i = 0;
+	j = 0;
+	new_str = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (!new_str)
+		return (NULL);
+	if (!s1)
+	{
+		while (s2[j] != '\0')
+		{
+			new_str[i + j] = s2[j];
+			j++;
+		}
+	}
+	else
+	{
+		while (s1[i] != '\0')
+		{
+			new_str[i] = s1[i];
+			i++;
+		}
+		while (s2[j] != '\0')
+		{
+			new_str[i + j] = s2[j];
+			j++;
+		}
+	}
+	new_str[i + j] = '\0';
+	return (new_str);
+}*/
+
 char	*ft_strjoin(char *s1, char *s2)
 {
 	int		i;
@@ -118,7 +164,6 @@ char	*ft_strjoin(char *s1, char *s2)
 	new_str[i + j] = '\0';
 	return (new_str);
 }
-
 
 void	ft_putchar(char c)
 {
@@ -163,7 +208,7 @@ char	*ft_read(int fd)
 	int		ret;
 	char	*buf;
 	char	*new_str;
-	char	*tmp;
+	//char	*tmp;
 	
 	ret = 1;
 	
@@ -176,13 +221,13 @@ char	*ft_read(int fd)
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
 		buf[ret] = '\0';
-		printf("le buf est de taille 7 :%s\n",buf);
+		printf("le buf est de taille 5 :%s\n",buf);
 		//printf("comportement du buf : %s\n",buf);
-		tmp = new_str;
-		new_str = ft_strjoin(tmp, buf);
+		//tmp = new_str;
+		new_str = ft_strjoin(new_str, buf);
 
 		
-		free(tmp);
+		//free(tmp);
 		
 		//printf("comportement du buf apres strjoin : %s\n",new_str);
 	}
@@ -194,21 +239,37 @@ char	*ft_read(int fd)
 
 char	*get_next_line(int fd)
 {
-	static char	*before_n;
+	static char	*text_read;
+	static int	i;
 	char		*line;
-	
+	//char		*rest;
+	char		*join;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-		
-	printf("before_n : %s\n", before_n);
-	before_n = ft_read(fd);
-	printf("string join  -------------:%s\n", before_n);
 	
-	line = ft_strdup_before_n(before_n);
+	printf("before_n :%s\n", text_read);
+	//join = text_read;
+	
+	join = ft_read(fd);
+	printf("JOIN : %s\n", join);
+	
+	//printf("string join  -------------:%stest\n", text_read);
+	if (i == 0)
+	{
+		text_read =  ft_strdup("");
+		i++;
+	}
+	
+	line = ft_strjoin(text_read, join);
+	printf("string join2  -------------:%s\n", line);
+	//line = ft_strdup_before_n(join);
 	printf("line ---------------------:%s\n", line);
-	printf("before_n : %s\n", before_n);
-	before_n = ft_after_n(before_n);
-	printf("after_n ------------------: %s\n", before_n);
+	
+	//printf("before_n : %s\n", before_n);
+	text_read = ft_after_n(join);
+	printf("after_n ------------------:%s\n", text_read);
+	
+	//line = ft_strjoin(before_n, ft_read(fd));
 	
 	return (line);
 }
@@ -236,3 +297,26 @@ int	main()
 
 	return (0);
 }
+
+/*int	main(void)
+{
+	int		fd;
+	int		i = 0;
+	int		number_of_lines = 3;
+	char	*str;
+
+	fd = open("42.txt", O_RDONLY);
+	if (fd >= 0)
+	{
+		while (i < number_of_lines)
+		{
+			str = get_next_line(fd);
+			printf("RESULT Line %d = %s\n", i + 1, str);
+			if (i < number_of_lines)
+				free(str);
+			i++;
+		}
+		close(fd);
+	}
+	return (0);
+}*/
